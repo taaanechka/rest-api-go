@@ -17,8 +17,8 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-/rest-api-go/logs
-/rest-api-go/build
+/logs
+/build
 
 # Go workspace file
 go.work
