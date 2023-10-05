@@ -32,6 +32,7 @@ func main() {
 	}
 	storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
 	
+	// Create
 	user1 := user.User{
 		ID: "",
 		Email: "dev.test@mail.ru",
@@ -43,6 +44,34 @@ func main() {
 		panic(err)
 	}
 	logger.Info(user1ID)
+
+	// FindOne
+	user1Found, err := storage.FindOne(context.Background(), user1ID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(user1Found)
+
+	// Update
+	user1Found.Email = "newEmail@mail.ru"
+	err = storage.Update(context.Background(), user1Found)
+	if err != nil {
+		panic(err)
+	}
+
+	// Delete
+	err = storage.Delete(context.Background(), user1ID)
+	if err != nil {
+		panic(err)
+	}
+
+	// FindAll
+	users, _ := storage.FindAll(context.Background())
+	fmt.Printf("\nusers:\n")
+	for _, u := range users {
+		fmt.Printf("%v\n", u)
+	}
+	fmt.Println()
 
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
