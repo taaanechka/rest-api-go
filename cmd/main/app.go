@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/taaanechka/rest-api-go/internal/config"
 	"github.com/taaanechka/rest-api-go/internal/user"
+	"github.com/taaanechka/rest-api-go/internal/user/db"
+	"github.com/taaanechka/rest-api-go/pkg/client/mongodb"
 	"github.com/taaanechka/rest-api-go/pkg/logging"
 )
 
@@ -21,6 +24,25 @@ func main() {
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
+	cfgMongo := cfg.MongoDB
+	mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port,
+		cfgMongo.Username, cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
+	if err != nil {
+		panic(err)
+	}
+	storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
+	
+	user1 := user.User{
+		ID: "",
+		Email: "dev.test@mail.ru",
+		Username: "dev",
+		PasswordHash: "12345",
+	}
+	user1ID, err := storage.Create(context.Background(), user1)
+	if err != nil {
+		panic(err)
+	}
+	logger.Info(user1ID)
 
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
@@ -55,7 +77,7 @@ func start(router *httprouter.Router, cfg *config.Config) {
 	}
 
 	if listenErr != nil {
-		logger.Fatal(listenErr )
+		logger.Fatal(listenErr)
 	}
 
 	server := &http.Server{
