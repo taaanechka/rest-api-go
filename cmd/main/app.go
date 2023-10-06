@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -13,8 +12,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/taaanechka/rest-api-go/internal/config"
 	"github.com/taaanechka/rest-api-go/internal/user"
-	"github.com/taaanechka/rest-api-go/internal/user/db"
-	"github.com/taaanechka/rest-api-go/pkg/client/mongodb"
 	"github.com/taaanechka/rest-api-go/pkg/logging"
 )
 
@@ -24,54 +21,55 @@ func main() {
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
-	cfgMongo := cfg.MongoDB
-	mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port,
-		cfgMongo.Username, cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
-	if err != nil {
-		panic(err)
-	}
-	storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
-	
-	// Create
-	user1 := user.User{
-		ID: "",
-		Email: "dev.test@mail.ru",
-		Username: "dev",
-		PasswordHash: "12345",
-	}
-	user1ID, err := storage.Create(context.Background(), user1)
-	if err != nil {
-		panic(err)
-	}
-	logger.Info(user1ID)
 
-	// FindOne
-	user1Found, err := storage.FindOne(context.Background(), user1ID)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(user1Found)
+	// cfgMongo := cfg.MongoDB
+	// mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port,
+	// 	cfgMongo.Username, cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
 
-	// Update
-	user1Found.Email = "newEmail@mail.ru"
-	err = storage.Update(context.Background(), user1Found)
-	if err != nil {
-		panic(err)
-	}
+	// // Create
+	// user1 := user.User{
+	// 	ID: "",
+	// 	Email: "dev.test@mail.ru",
+	// 	Username: "dev",
+	// 	PasswordHash: "12345",
+	// }
+	// user1ID, err := storage.Create(context.Background(), user1)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// logger.Info(user1ID)
 
-	// Delete
-	err = storage.Delete(context.Background(), user1ID)
-	if err != nil {
-		panic(err)
-	}
+	// // FindOne
+	// user1Found, err := storage.FindOne(context.Background(), user1ID)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(user1Found)
 
-	// FindAll
-	users, _ := storage.FindAll(context.Background())
-	fmt.Printf("\nusers:\n")
-	for _, u := range users {
-		fmt.Printf("%v\n", u)
-	}
-	fmt.Println()
+	// // Update
+	// user1Found.Email = "newEmail@mail.ru"
+	// err = storage.Update(context.Background(), user1Found)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// // Delete
+	// err = storage.Delete(context.Background(), user1ID)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// // FindAll
+	// users, _ := storage.FindAll(context.Background())
+	// fmt.Printf("\nusers:\n")
+	// for _, u := range users {
+	// 	fmt.Printf("%v\n", u)
+	// }
+	// fmt.Println()
 
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
