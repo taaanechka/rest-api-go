@@ -28,7 +28,7 @@ func main() {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
+	// storage := user.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
 
 	// // Create
 	// user1 := user.User{
