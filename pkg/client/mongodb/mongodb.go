@@ -3,32 +3,36 @@ package mongodb
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewClient(ctx context.Context, host, port,
-	username, password, database, authDB string) (*mongo.Database, error) {
-	var mongoDBURL string
+var client *mongo.Client
 
-	if username == "" && password == "" {
-		mongoDBURL = fmt.Sprintf("mongodb://%s:%s", host, port)
-	} else {
-		mongoDBURL = fmt.Sprintf("mongodb://%s:%s@%s:%s", username, password, host, port)
-	}
+func NewClient(ctx context.Context,
+	host, port, username, password, database, authDB string,
+) (*mongo.Database, error) {
+	err := sync.OnceValue(func() (err error) {
+		var mongoDBURL string
 
-	clientOptions := options.Client().ApplyURI(mongoDBURL)
+		if username == "" && password == "" {
+			mongoDBURL = fmt.Sprintf("mongodb://%s:%s", host, port)
+		} else {
+			mongoDBURL = fmt.Sprintf("mongodb://%s:%s@%s:%s", username, password, host, port)
+		}
 
-	fmt.Println(mongoDBURL)
-
-	client, err := mongo.Connect(ctx, clientOptions)
+		clientOptions := options.Client().ApplyURI(mongoDBURL)
+		client, err = mongo.Connect(ctx, clientOptions)
+		return err
+	})()
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to mongoDB due to error: %v", err)
+		return nil, fmt.Errorf("failed to connect to mongoDB: %w", err)
 	}
 
 	if err = client.Ping(ctx, nil); err != nil {
-		return nil, fmt.Errorf("failed to ping mongoDB due to error: %v", err)
+		return nil, fmt.Errorf("failed to ping mongoDB: %w", err)
 	}
 
 	return client.Database(database), nil
