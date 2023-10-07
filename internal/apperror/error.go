@@ -5,14 +5,17 @@ import (
 )
 
 var (
-	ErrNotFound = NewAppError(nil, "not found", "", "US-000003")
+	ErrBadID     = NewAppError(nil, "bad user id", "")
+	ErrNotFound  = NewAppError(nil, "not found", "")
+	ErrCreate    = NewAppError(nil, "failed to create user", "")
+	ErrUpdate    = NewAppError(nil, "failed to update user", "")
+	ErrDelete    = NewAppError(nil, "failed to delete user", "")
 )
 
 type AppError struct {
 	Err              error  `json:"-"`
-	Message          string `json:"message, omitempty"`
-	DeveloperMessage string `json:"developer_message, omitempty"`
-	Code             string `json:"code, omitempty"`
+	Message          string `json:"message,omitempty"`
+	DeveloperMessage string `json:"developer_message,omitempty"`
 }
 
 func (e *AppError) Error() string {
@@ -31,15 +34,14 @@ func (e *AppError) Marshal() []byte {
 	return marshal
 }
 
-func NewAppError(err error, message, developerMessage, code string) *AppError {
+func NewAppError(err error, message, developerMessage string) *AppError {
 	return &AppError{
 		Err:              err,
 		Message:          message,
 		DeveloperMessage: developerMessage,
-		Code:             code,
 	}
 }
 
 func systemError(err error) *AppError {
-	return NewAppError(err, "internal system error", err.Error(), "US-000000")
+	return NewAppError(err, "internal system error", err.Error())
 }

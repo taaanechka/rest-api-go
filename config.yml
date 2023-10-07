@@ -4,7 +4,7 @@ listen:
   type: port
   bind_ip: 0.0.0.0
   port: 10000
-mongodb:
+users:
   host: localhost
   port: 27017
   database: user-service
@@ -12,3 +12,5 @@ mongodb:
   username: root
   password: password
   collection: users
+  indexes:  
+      - email

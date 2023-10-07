@@ -5,31 +5,50 @@ Content-Type: application/json
 
 ###
 
+GET http://localhost:10000/users/6521bc03651a0148eda6f158
+Content-Type: application/json
+
+###
+
 GET http://localhost:10000/users
 Content-Type: application/json
 
 ###
 
-POST http://localhost:10000/users
+POST http://localhost:10000/users HTTP/1.1
 Content-Type: application/json
+
+{
+    "email": "dev2@mail.ru",
+    "username": "dev2",
+    "password": "78901"
+}
 
 ###
 
-PUT http://localhost:10000/users/1
+# PUT http://localhost:10000/users/65214204058618cd58234eaf
+PUT http://localhost:10000/users/6521bc9b80a122b3d3daaa12
 Content-Type: application/json
 
-{}
+{
+    "email": "dev3@mail.ru",
+    "username": "dev3",
+    "password": "78903"
+}
+
 
 ###
 
-PATCH http://localhost:10000/users/1
+PATCH http://localhost:10000/users/6521bc9b80a122b3d3daaa12
 Content-Type: application/json
 
-{}
+{
+    "email": "dev4@mail.ru"
+}
 
 ###
 
-DELETE http://localhost:10000/users/1
+DELETE http://localhost:10000/users/6521c11b13ed2054b2d17dc3
 Content-Type: application/json
 
 {}
